@@ -482,6 +482,19 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 	}
 
+	/**
+	 * 添加beanFactoryPostProcessor的时机
+	 * ApplicationContextInitializer.initialize方法
+	 * SpringApplication.run()
+	 * - prepareContext(context, environment, listeners, applicationArguments, printedBanner);
+	 *   - applyInitializers(context);
+	 *     - initializer.initialize(context);
+	 *       - ApplicationContextInitializer
+	 *         - public void initialize(ConfigurableApplicationContext applicationContext) {
+	 *              applicationContext.addBeanFactoryPostProcessor(new CachingMetadataReaderFactoryPostProcessor());
+	 *            }
+	 * @param postProcessor the factory processor to register
+	 */
 	@Override
 	public void addBeanFactoryPostProcessor(BeanFactoryPostProcessor postProcessor) {
 		Assert.notNull(postProcessor, "BeanFactoryPostProcessor must not be null");
@@ -491,6 +504,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	/**
 	 * Return the list of BeanFactoryPostProcessors that will get applied
 	 * to the internal BeanFactory.
+	 * 获取已经注册的bean工厂后置处理器
 	 */
 	public List<BeanFactoryPostProcessor> getBeanFactoryPostProcessors() {
 		return this.beanFactoryPostProcessors;
@@ -526,12 +540,17 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 			try {
 				// Allows post-processing of the bean factory in context subclasses.
-				postProcessBeanFactory(beanFactory);
+				// 后置bean工厂处理,默认空方法. 子类实现
+				// 是提供给想要实现BeanPostProcessor的三方框架使用的。
+				// 作用是在BeanFactory准备工作完成后做一些定制化的处理
+                postProcessBeanFactory(beanFactory);
 
 				// Invoke factory processors registered as beans in the context.
+				// 调用bean工厂的后置处理器
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
+				// 注册所有的bean后置处理器
 				registerBeanPostProcessors(beanFactory);
 
 				// Initialize message source for this context.
@@ -701,6 +720,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * Instantiate and invoke all registered BeanFactoryPostProcessor beans,
 	 * respecting explicit order if given.
 	 * <p>Must be called before singleton instantiation.
+	 * ApplicationContextInitializer.initialize(ConfigurableApplicationContext applicationContext)的实现类添加的后置处理器
+	 * SpringApplication是在prepareContext(context, environment, listeners, applicationArguments, printedBanner);时候调用添加后置处理器的
 	 */
 	protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
 		PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors());

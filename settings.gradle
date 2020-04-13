@@ -1,7 +1,7 @@
 pluginManagement {
 	repositories {
 		gradlePluginPortal()
-		maven { url 'https://repo.spring.io/plugins-release' }
+		maven { url 'http://192.168.2.233:8081/repository/maven-public/' }
 	}
 }
 apply from: "$rootDir/gradle/build-cache-settings.gradle"
