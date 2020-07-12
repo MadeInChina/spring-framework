@@ -50,6 +50,8 @@ import org.springframework.lang.Nullable;
  * selection of imports until all {@code @Configuration} classes have been processed
  * (see {@link DeferredImportSelector} for details).
  *
+ * 该接口可以实现筛选哪些类可以被导入
+ *
  * @author Chris Beams
  * @author Juergen Hoeller
  * @since 3.1

@@ -27,6 +27,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
+ * SpringApplication.run()方式启动,如果webApplicationType是SERVLET类型
+ * 使用AnnotationConfigApplicationContext作为应用上下文
  * Standalone application context, accepting <em>component classes</em> as input &mdash;
  * in particular {@link Configuration @Configuration}-annotated classes, but also plain
  * {@link org.springframework.stereotype.Component @Component} types and JSR-330 compliant
@@ -63,6 +65,10 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * through {@link #register} calls and then manually {@linkplain #refresh refreshed}.
 	 */
 	public AnnotationConfigApplicationContext() {
+		// 需要注意AnnotatedBeanDefinitionReader注解bean定义读取器
+		// 会注册一个ConfigurationClassPostProcessor后置处理器到BeanDefinitionRegistry
+		// RootBeanDefinition(ConfigurationClassPostProcessor.class)
+		// 主要解析@Component,@Configuration,@ComponentScan、@Import注解信息
 		this.reader = new AnnotatedBeanDefinitionReader(this);
 		this.scanner = new ClassPathBeanDefinitionScanner(this);
 	}

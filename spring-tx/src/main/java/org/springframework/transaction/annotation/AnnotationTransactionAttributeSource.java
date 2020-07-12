@@ -31,6 +31,9 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
+ * AbstractFallbackTransactionAttributeSource.computeTransactionAttribute方法调用过来
+ * TransactionAttribute txAttr = findTransactionAttribute(specificMethod)
+ *
  * Implementation of the
  * {@link org.springframework.transaction.interceptor.TransactionAttributeSource}
  * interface for working with transaction metadata in JDK 1.5+ annotation format.
@@ -51,6 +54,7 @@ import org.springframework.util.ClassUtils;
  * @see Ejb3TransactionAnnotationParser
  * @see org.springframework.transaction.interceptor.TransactionInterceptor#setTransactionAttributeSource
  * @see org.springframework.transaction.interceptor.TransactionProxyFactoryBean#setTransactionAttributeSource
+ * 注解事务属性源
  */
 @SuppressWarnings("serial")
 public class AnnotationTransactionAttributeSource extends AbstractFallbackTransactionAttributeSource
@@ -155,6 +159,10 @@ public class AnnotationTransactionAttributeSource extends AbstractFallbackTransa
 
 	@Override
 	@Nullable
+	/**
+	 * @see SpringTransactionAnnotationParser#parseTransactionAnnotation
+	 * 在实现类,实现类方法,接口,接口方法上找注解属性@Transactional
+	 */
 	protected TransactionAttribute findTransactionAttribute(Method method) {
 		return determineTransactionAttribute(method);
 	}

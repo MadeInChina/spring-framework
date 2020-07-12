@@ -530,23 +530,28 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	public void refresh() throws BeansException, IllegalStateException {
 		synchronized (this.startupShutdownMonitor) {
 			// Prepare this context for refreshing.
+			// 初始化(重置)上下文
 			prepareRefresh();
 
-			// Tell the subclass to refresh the internal bean factory.
+			// Tell the subclass to refresh the internal bean factory.(子类刷新内部bean工厂)
+			// Spring boot最终使用 GenericApplicationContext,在这里没有注册bean定义
+			// Spring boot注册bean定义是在调用SpringApplication类的prepareContext时
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			// Prepare the bean factory for use in this context.
 			prepareBeanFactory(beanFactory);
 
 			try {
-				// Allows post-processing of the bean factory in context subclasses.
-				// 后置bean工厂处理,默认空方法. 子类实现
-				// 是提供给想要实现BeanPostProcessor的三方框架使用的。
-				// 作用是在BeanFactory准备工作完成后做一些定制化的处理
-                postProcessBeanFactory(beanFactory);
+				// Allows post-processing of the bean factory in context subclasses.(子类允许后置处理bean工厂)
+				// Modify the application context's internal bean factory after its standard initialization.(初始化以后,修改应用上下文内部的bean工厂)
+				// All bean definitions will have been loaded, but no beans will have been instantiated yet.(所有的bean定义已经被加载,但是这些bean还没有被初始化)
+				// This allows for registering special BeanPostProcessors etc in certain ApplicationContext implementations. (根据不同的上下文实现,加载特定的bean后置处理器)
+				postProcessBeanFactory(beanFactory);
 
 				// Invoke factory processors registered as beans in the context.
 				// 调用bean工厂的后置处理器
+				// 配置,导入相关的逻辑在这里处理
+				// 处理Spring容器本身的BFPP后置处理器
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
@@ -566,6 +571,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				registerListeners();
 
 				// Instantiate all remaining (non-lazy-init) singletons.
+				// 实例化所有剩余的(非懒加载)的单例集合
 				finishBeanFactoryInitialization(beanFactory);
 
 				// Last step: publish corresponding event.
@@ -724,6 +730,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * SpringApplication是在prepareContext(context, environment, listeners, applicationArguments, printedBanner);时候调用添加后置处理器的
 	 */
 	protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
+		// bean工厂后置处理BFPP
 		PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors());
 
 		// Detect a LoadTimeWeaver and prepare for weaving, if found in the meantime
@@ -896,6 +903,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		beanFactory.freezeConfiguration();
 
 		// Instantiate all remaining (non-lazy-init) singletons.
+		// 实例化非懒加载的所有bean
 		beanFactory.preInstantiateSingletons();
 	}
 

@@ -235,8 +235,10 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 
 	@Override
 	protected Object doGetTransaction() {
+		// 创建一个数据源事务对象
 		DataSourceTransactionObject txObject = new DataSourceTransactionObject();
 		txObject.setSavepointAllowed(isNestedTransactionAllowed());
+		// 连接持有器(包装jdbc信息)
 		ConnectionHolder conHolder =
 				(ConnectionHolder) TransactionSynchronizationManager.getResource(obtainDataSource());
 		txObject.setConnectionHolder(conHolder, false);
@@ -251,6 +253,13 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 
 	/**
 	 * This implementation sets the isolation level but ignores the timeout.
+	 * 开始事务
+	 * 1.第一次进来事务对象都为空,通过数据源获取连接封装事务持有器到事务对象中
+	 * 2.设置事务隔离级别
+	 * 3.关闭自动提交
+	 * 4.激活当前数据源事务对象的事务配置
+	 * 5.设置超时时间
+	 * 6.数据源和连接持有器绑定
 	 */
 	@Override
 	protected void doBegin(Object transaction, TransactionDefinition definition) {
@@ -260,10 +269,12 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 		try {
 			if (!txObject.hasConnectionHolder() ||
 					txObject.getConnectionHolder().isSynchronizedWithTransaction()) {
+				// 获取数据库连接
 				Connection newCon = obtainDataSource().getConnection();
 				if (logger.isDebugEnabled()) {
 					logger.debug("Acquired Connection [" + newCon + "] for JDBC transaction");
 				}
+				// 设置连接持有器(1.第一次进来事务对象都为空,通过数据源获取连接封装事务持有器到事务对象中)
 				txObject.setConnectionHolder(new ConnectionHolder(newCon), true);
 			}
 
@@ -271,6 +282,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 			con = txObject.getConnectionHolder().getConnection();
 
 			Integer previousIsolationLevel = DataSourceUtils.prepareConnectionForTransaction(con, definition);
+			// 设置事务传播级别(2.设置事务隔离级别)
 			txObject.setPreviousIsolationLevel(previousIsolationLevel);
 			txObject.setReadOnly(definition.isReadOnly());
 
@@ -282,19 +294,23 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 				if (logger.isDebugEnabled()) {
 					logger.debug("Switching JDBC Connection [" + con + "] to manual commit");
 				}
+				// 关闭自动提交(3.关闭自动提交)
 				con.setAutoCommit(false);
 			}
 
 			prepareTransactionalConnection(con, definition);
+			// 4.激活当前数据源事务对象的事务配置
 			txObject.getConnectionHolder().setTransactionActive(true);
 
 			int timeout = determineTimeout(definition);
+			// 设置超时时间(5.设置超时时间)
 			if (timeout != TransactionDefinition.TIMEOUT_DEFAULT) {
 				txObject.getConnectionHolder().setTimeoutInSeconds(timeout);
 			}
 
 			// Bind the connection holder to the thread.
 			if (txObject.isNewConnectionHolder()) {
+				// 绑定连接持有器设置到当前线程(6.数据源和连接持有器绑定)
 				TransactionSynchronizationManager.bindResource(obtainDataSource(), txObject.getConnectionHolder());
 			}
 		}

@@ -55,6 +55,9 @@ public abstract class AbstractTransactionManagementConfiguration implements Impo
 
 
 	@Override
+	/**
+	 * 获取EnableTransactionManagement的注解属性
+	 */
 	public void setImportMetadata(AnnotationMetadata importMetadata) {
 		this.enableTx = AnnotationAttributes.fromMap(
 				importMetadata.getAnnotationAttributes(EnableTransactionManagement.class.getName(), false));

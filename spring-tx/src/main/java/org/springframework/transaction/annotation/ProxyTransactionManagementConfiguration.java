@@ -34,6 +34,11 @@ import org.springframework.transaction.interceptor.TransactionInterceptor;
  * @since 3.1
  * @see EnableTransactionManagement
  * @see TransactionManagementConfigurationSelector
+ * 代理事务管理配置类
+ * 向容器添加bean
+ * BeanFactoryTransactionAttributeSourceAdvisor
+ * TransactionAttributeSource
+ * TransactionInterceptor
  */
 @Configuration(proxyBeanMethods = false)
 @Role(BeanDefinition.ROLE_INFRASTRUCTURE)

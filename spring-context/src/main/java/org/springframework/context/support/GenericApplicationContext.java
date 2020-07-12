@@ -104,6 +104,9 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 
 
 	/**
+	 * 构造函数实例化默认的beanFactory->DefaultListableBeanFactory
+	 * Spring-boot启动时,通过方法createApplicationContext(),实例化对应的上下文(AnnotationConfigServletWebServerApplicationContext)
+	 * 然后调用GenericApplicationContext构造方法
 	 * Create a new GenericApplicationContext.
 	 * @see #registerBeanDefinition
 	 * @see #refresh

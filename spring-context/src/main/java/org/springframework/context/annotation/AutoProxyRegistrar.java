@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.springframework.aop.config.AopConfigUtils;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotationMetadata;
@@ -34,6 +35,11 @@ import org.springframework.core.type.AnnotationMetadata;
  * @author Chris Beams
  * @since 3.1
  * @see EnableAspectJAutoProxy
+ * ImportBeanDefinitionRegistrar相关的接口是在AbstractApplicationContext.invokeBeanFactoryPostProcessors(beanFactory)处被调用的
+ * @see org.springframework.context.support.AbstractApplicationContext#invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory)
+ * @see org.springframework.context.annotation.ConfigurationClassPostProcessor#postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory)
+ * @see org.springframework.context.annotation.ConfigurationClassPostProcessor#processConfigBeanDefinitions(BeanDefinitionRegistry registry)
+ * ImportSelector接口调用完成后,配置类信息加载完成,然后开始处理ImportBeanDefinitionRegistrar接口相关
  */
 public class AutoProxyRegistrar implements ImportBeanDefinitionRegistrar {
 

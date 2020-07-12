@@ -17,6 +17,7 @@
 package org.springframework.beans.factory;
 
 /**
+ * 回调接口,所有的单例bean初始化完成后调用
  * Callback interface triggered at the end of the singleton pre-instantiation phase
  * during {@link BeanFactory} bootstrap. This interface can be implemented by
  * singleton beans in order to perform some initialization after the regular

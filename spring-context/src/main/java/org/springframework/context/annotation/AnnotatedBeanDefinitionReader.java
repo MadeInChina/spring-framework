@@ -234,6 +234,7 @@ public class AnnotatedBeanDefinitionReader {
 	}
 
 	/**
+	 * 获取bean的元信息,然后注册bean定义信息到BeanDefinitionRegistry
 	 * Register a bean from the given bean class, deriving its metadata from
 	 * class-declared annotations.
 	 * @param beanClass the class of the bean
@@ -282,6 +283,7 @@ public class AnnotatedBeanDefinitionReader {
 
 		BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(abd, beanName);
 		definitionHolder = AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
+		// 注册bean定义到BeanDefinitionRegistry->beanName:类名. eg. demoApplication
 		BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, this.registry);
 	}
 

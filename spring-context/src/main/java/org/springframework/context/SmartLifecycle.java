@@ -17,6 +17,7 @@
 package org.springframework.context;
 
 /**
+ * 当Spring容器初始化完成后需要紧接着执行一些异步任务时,可以使用该接口
  * An extension of the {@link Lifecycle} interface for those objects that require
  * to be started upon {@code ApplicationContext} refresh and/or shutdown in a
  * particular order.

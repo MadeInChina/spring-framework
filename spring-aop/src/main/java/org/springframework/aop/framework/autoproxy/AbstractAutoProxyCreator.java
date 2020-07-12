@@ -202,6 +202,11 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		this.applyCommonInterceptorsFirst = applyCommonInterceptorsFirst;
 	}
 
+	/**
+	 * BeanFactoryAware接口方法
+	 * @param beanFactory owning BeanFactory (never {@code null}).
+	 * The bean can immediately call methods on the factory.
+	 */
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
@@ -240,14 +245,36 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		return wrapIfNecessary(bean, beanName, cacheKey);
 	}
 
-	@Override
-	public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) {
+  /**
+   * InstantiationAwareBeanPostProcessor接口方法
+   * InstantiationAwareBeanPostProcessor和BeanPostProcessor接口执行顺序
+   * InstantiationAwareBeanPostProcessor
+   * --->postProcessBeforeInstantiation
+   *    被实例化
+   * --->postProcessAfterInstantiation
+   * --->postProcessPropertyValues
+   *    设置属性
+   * BeanPostProcessor
+   * --->postProcessBeforeInitialization
+   * --->init-method
+   *    自定义初始化的方法
+   * --->postProcessAfterInitialization
+   *
+   * 这个方法主要找增强器advisor
+   * @param beanClass the class of the bean to be instantiated
+   * @param beanName the name of the bean
+   * @return
+   */
+  @Override
+  public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) {
 		Object cacheKey = getCacheKey(beanClass, beanName);
 
 		if (!StringUtils.hasLength(beanName) || !this.targetSourcedBeans.contains(beanName)) {
 			if (this.advisedBeans.containsKey(cacheKey)) {
 				return null;
 			}
+			// 判断是否是基础bean(Advice,Pointcut,Advisor,AopInfrastructureBean)
+			// 是否跳过
 			if (isInfrastructureClass(beanClass) || shouldSkip(beanClass, beanName)) {
 				this.advisedBeans.put(cacheKey, Boolean.FALSE);
 				return null;
@@ -271,6 +298,13 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		return null;
 	}
 
+	/**
+	 * InstantiationAwareBeanPostProcessor接口方法
+	 * Instantiation 表示实例化,对象还未生成
+	 * @param bean the bean instance created, with properties not having been set yet
+	 * @param beanName the name of the bean
+	 * @return
+	 */
 	@Override
 	public boolean postProcessAfterInstantiation(Object bean, String beanName) {
 		return true;
@@ -281,12 +315,21 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		return pvs;
 	}
 
+	/**
+	 * BeanPostProcessor接口方法
+	 * Initialization 表示初始化,对象已经生成
+	 * @param bean the new bean instance
+	 * @param beanName the name of the bean
+	 * @return
+	 */
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) {
 		return bean;
 	}
 
 	/**
+	 * BeanPostProcessor接口方法
+	 * 创建代理对象
 	 * Create a proxy with the configured interceptors if the bean is
 	 * identified as one to proxy by the subclass.
 	 * @see #getAdvicesAndAdvisorsForBean
